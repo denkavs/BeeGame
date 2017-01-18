@@ -1,0 +1,6 @@
+src/TestResults/
+src/GameLogic/bin/
+src/GameLogic/obj/
+src/BeeGameUnitTest/bin/
+src/BeeGameUnitTest/obj/
+src/.vs/
