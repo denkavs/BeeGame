@@ -11,5 +11,6 @@ namespace GameLogic.Interfaces
     {
         int Save(List<Bee> bees);
         List<Bee> Restore(int gameId);
+        void Remove(int gameId);
     }
 }

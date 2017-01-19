@@ -10,6 +10,11 @@ namespace GameLogic.Impl
 {
     class Repository : IRepository
     {
+        public void Remove(int gameId)
+        {
+            throw new NotImplementedException();
+        }
+
         public List<Bee> Restore(int gameId)
         {
             throw new NotImplementedException();

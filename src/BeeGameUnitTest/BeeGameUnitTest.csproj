@@ -60,9 +60,10 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="IServiceTest.cs" />
+    <Compile Include="ServiceTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DivideClassTest.cs" />
+    <Compile Include="GamePlayEngineTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GameLogic\GameLogic.csproj">

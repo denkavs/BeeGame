@@ -46,6 +46,11 @@ namespace GameLogic.Model
                     GameContext context = this.factory.CreateContext(bees, hittedBee);
                     this.gameEngine.Play(context);
                     gi = new GameInfo(gameId, context.SelectedBee, context.Bees, context.GameResult.GameState, context.GameResult.Message);
+
+                    if(context.GameResult.GameState == GameState.Finished)
+                    {
+                        this.repository.Remove(gameId);
+                    }
                 }
                 else
                 {
