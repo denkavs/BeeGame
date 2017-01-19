@@ -9,8 +9,10 @@ namespace GameLogic.Interfaces
 {
     public interface IRepository
     {
+        // Returns gameId
         int Save(List<Bee> bees);
         List<Bee> Restore(int gameId);
-        void Remove(int gameId);
+        // Returns true if successful else false
+        bool Remove(int gameId);
     }
 }

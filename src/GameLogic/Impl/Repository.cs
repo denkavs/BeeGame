@@ -10,19 +10,52 @@ namespace GameLogic.Impl
 {
     class Repository : IRepository
     {
-        public void Remove(int gameId)
+        private static readonly Dictionary<int, List<Bee>> deport = new Dictionary<int, List<Bee>>();
+        private static int index = 0;
+        private static readonly Object locker = new object();
+        static Repository()
         {
-            throw new NotImplementedException();
+        }
+
+        public bool Remove(int gameId)
+        {
+            lock (locker)
+            {
+                if (deport.ContainsKey(gameId))
+                {
+                    return deport.Remove(gameId);
+                }
+            }
+            return false;
         }
 
         public List<Bee> Restore(int gameId)
         {
-            throw new NotImplementedException();
+            List<Bee> result = null;
+            lock (locker)
+            {
+                if (deport.ContainsKey(gameId))
+                {
+                    result = new List<Bee>();
+                    deport[gameId].ForEach(b=> { result.Add(new Bee(b.Id, b.LifeSpan, b.Type)); } );
+                }
+            }
+            return result;
         }
 
         public int Save(List<Bee> bees)
         {
-            throw new NotImplementedException();
+            int result = 0;
+
+            if(bees != null && bees.Count > 0)
+            {
+                lock (locker)
+                {
+                    result = ++index;
+                    deport.Add(result, bees);
+                }
+            }
+            return result;
         }
     }
 }
