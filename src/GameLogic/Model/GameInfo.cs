@@ -8,7 +8,7 @@ namespace GameLogic.Model
 {
     public struct GameInfo
     {
-        GameInfo(int gameId, Bee selected, List<Bee> bees, GameState state, string message)
+        public GameInfo(int gameId, Bee selected, List<Bee> bees, GameState state, string message)
         {
             this.SelectedBee = selected;
             this.Bees = bees;

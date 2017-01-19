@@ -8,7 +8,7 @@ namespace GameLogic.Model
 {
     public enum BeeType
     {
-        None,
+        Unknown,
         Queen,
         Worker,
         Drone
@@ -16,7 +16,7 @@ namespace GameLogic.Model
 
     public enum GameState
     {
-        None,
+        Unknown,
         Started,
         InProgress,
         Finished,

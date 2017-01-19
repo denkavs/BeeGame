@@ -26,7 +26,33 @@ namespace GameLogic.Model
 
         public GameInfo ProcessHit(int gameId)
         {
-            throw new NotImplementedException();
+            GameInfo gi;
+            if(gameId == 0)
+            {
+                // create new game
+                List<BeeConfig> cofiguration = this.confMgr.GetInitData();
+                List<Bee> bees = this.factory.CreateBees(cofiguration);
+                int id = this.repository.Save(bees);
+                gi = new GameInfo(id, null, bees, id != 0 ? GameState.Started : GameState.Failed, string.Empty);
+            }
+            else
+            {
+                // load game by gameId, make hit, return result
+                List<Bee> bees = this.repository.Restore(gameId);
+                // if bees == null then game does not exist.
+                if(bees != null)
+                {
+                    Bee hittedBee = this.beeCatcher.Hit(bees);
+                    GameContext context = this.factory.CreateContext(bees, hittedBee);
+                    this.gameEngine.Play(context);
+                    gi = new GameInfo(gameId, context.SelectedBee, context.Bees, context.GameResult.GameState, context.GameResult.Message);
+                }
+                else
+                {
+                    gi = new GameInfo(0, null, null, GameState.Unknown, "Unknown game.");
+                }
+            }
+            return gi;
         }
     }
 }

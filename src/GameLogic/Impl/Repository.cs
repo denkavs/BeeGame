@@ -15,7 +15,7 @@ namespace GameLogic.Impl
             throw new NotImplementedException();
         }
 
-        public void Save(List<Bee> bees, int gameId)
+        public int Save(List<Bee> bees)
         {
             throw new NotImplementedException();
         }

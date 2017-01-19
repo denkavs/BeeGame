@@ -10,58 +10,130 @@ namespace BeeGameUnitTest
     [TestClass]
     public class IServiceTest
     {
-        private static Mock<IRepository> repository;
-        private static Mock<IConfiguration> config;
-        private static Mock<IGamePlayEngine> engine;
-        private static Mock<IGameFactory> factory;
         private static List<Bee> bees;
+        private static int gameId = 3;
+        private static List<BeeConfig> configLst;
 
         [ClassInitialize()]
         public static void ClassInit(TestContext context)
         {
-            IServiceTest.bees = new List<Bee> {
-                new Bee(1, 10, BeeType.Queen) ,new Bee(1, 5, BeeType.Worker) ,new Bee(2, 5, BeeType.Worker)
-                ,new Bee(3, 3, BeeType.Drone) ,new Bee(4, 3, BeeType.Drone) ,new Bee(5, 3, BeeType.Drone)
-            };
-            IServiceTest.repository = new Mock<IRepository>();
-            IServiceTest.repository.Setup(a => a.Restore(It.IsAny<int>())).Returns(IServiceTest.bees);
-
-            IServiceTest.config = new Mock<IConfiguration>();
-            IServiceTest.config.Setup(a => a.GetInitData()).Returns(new List<BeeConfig> {
-                new BeeConfig() { Count = 1, Deduction = 5, LifeSpan = 10, Type = BeeType.Queen },
-                new BeeConfig() { Count = 2, Deduction = 2, LifeSpan = 5, Type = BeeType.Worker },
-                new BeeConfig() { Count = 3, Deduction = 2, LifeSpan = 3, Type = BeeType.Drone }
-            });
-
-            IServiceTest.engine = new Mock<IGamePlayEngine>();
-            IServiceTest.engine.Setup(e => e.Play(It.IsAny<GameContext>()));
-
-            IServiceTest.factory = new Mock<IGameFactory>();
-            IServiceTest.factory.Setup<List<Bee>>(f => f.CreateBees(It.IsAny<List<BeeConfig>>())).Returns(IServiceTest.bees);
         }
 
         [TestInitialize()]
         public void Initialize()
         {
-            //this.service = new Service(this.repository.Object, catcher, config.Object, this.factory.Object, this.engine.Object);
+            IServiceTest.bees = new List<Bee> {
+                new Bee(1, 10, BeeType.Queen) ,new Bee(1, 5, BeeType.Worker) ,new Bee(2, 5, BeeType.Worker)
+                ,new Bee(3, 3, BeeType.Drone) ,new Bee(4, 3, BeeType.Drone) ,new Bee(5, 3, BeeType.Drone)
+            };
+
+            IServiceTest.configLst = new List<BeeConfig> {
+                new BeeConfig() { Count = 1, Deduction = 5, LifeSpan = 10, Type = BeeType.Queen },
+                new BeeConfig() { Count = 2, Deduction = 2, LifeSpan = 5, Type = BeeType.Worker },
+                new BeeConfig() { Count = 3, Deduction = 2, LifeSpan = 3, Type = BeeType.Drone }
+            };
         }
         [TestCleanup()]
         public void Cleanup()
         {
-            //this.service = null;
         }
 
         [TestMethod]
-        public void StartGame()
+        public void ProcessHit_ReturnNewGame()
         {
-            IService service = new Service(IServiceTest.repository.Object, null, IServiceTest.config.Object, IServiceTest.factory.Object, IServiceTest.engine.Object);
+            Mock<IConfiguration> config = new Mock<IConfiguration>();
+            config.Setup(c => c.GetInitData()).Returns(IServiceTest.configLst);
+
+            Mock<IGameFactory> factory = new Mock<IGameFactory>();
+            factory.Setup(f => f.CreateBees(It.IsAny<List<BeeConfig>>())).Returns(IServiceTest.bees);
+
+            Mock<IRepository> repository = new Mock<IRepository>();
+            repository.Setup(r => r.Save(It.Is<List<Bee>>((b) => Object.ReferenceEquals(b, IServiceTest.bees)))).Returns(IServiceTest.gameId);
+
+            IService service = new Service(repository.Object, null, config.Object, factory.Object, null);
 
             GameInfo gi = service.ProcessHit(0);
 
             Assert.IsTrue(gi.State == GameState.Started);
-            Assert.IsTrue(gi.GameId == 1);
+            Assert.IsTrue(gi.GameId == 3);
             Assert.AreEqual(gi.Bees[0].Type, IServiceTest.bees[0].Type);
             Assert.AreEqual(gi.Bees.Count, IServiceTest.bees.Count);
+        }
+
+        [TestMethod]
+        public void ProcessHit_GameInProgress()
+        {
+            // arrange
+            int gameiD = 1;
+            Bee hittedBee = IServiceTest.bees[1];
+            Mock<IRepository> repository = new Mock<IRepository>();
+            repository.Setup(r => r.Restore(It.Is<int>((b) => b == gameiD))).Returns(IServiceTest.bees); // game exist
+
+            Mock<IBeeCatcher> catcher = new Mock<IBeeCatcher>();
+            catcher.Setup(c => c.Hit(It.Is<List<Bee>>(b => Object.ReferenceEquals(b, IServiceTest.bees)))).Returns(hittedBee); // select hitted bee
+
+            Mock<IGameFactory> factory = new Mock<IGameFactory>();
+            GameContext context = new GameContext()
+            {
+                SelectedBee = hittedBee,
+                Bees = IServiceTest.bees,
+                GameResult = new GameResult() { GameState = GameState.InProgress, Message = "Do next hit" }
+            };
+            factory.Setup(f => f.CreateContext(It.Is<List<Bee>>(b => Object.ReferenceEquals(b, IServiceTest.bees)), It.Is<Bee>(bOne => Object.ReferenceEquals(bOne, hittedBee)))).Returns(context); // create game context
+
+            Mock<IGamePlayEngine> engine = new Mock<IGamePlayEngine>();
+            engine.Setup(e => e.Play(It.Is<GameContext>(gc => Object.ReferenceEquals(gc, context))));
+            context.SelectedBee.RemoveLifeSpan(3);
+            IService service = new Service(repository.Object, catcher.Object, null, factory.Object, engine.Object);
+
+            // perform
+            GameInfo gi = service.ProcessHit(gameiD);
+
+            // check
+            Assert.IsTrue(gi.State == GameState.InProgress);
+            Assert.IsTrue(gi.GameId == gameiD);
+            Assert.AreEqual(2, gi.SelectedBee.LifeSpan);
+            Assert.AreEqual(gi.Bees.Count, IServiceTest.bees.Count);
+        }
+
+        [TestMethod]
+        public void ProcessHit_GameNotExist()
+        {
+            //arrange
+            int gameiD = 1;
+
+            Mock<IRepository> repository = new Mock<IRepository>();
+            repository.Setup(r => r.Restore(It.Is<int>((b) => b == gameiD))).Returns(()=> { return null; }); // game not exist
+
+            IService service = new Service(repository.Object, null, null, null, null);
+
+            // perform
+            GameInfo gi = service.ProcessHit(gameiD);
+
+            // check
+            Assert.IsTrue(gi.State == GameState.Unknown);
+            Assert.AreEqual(null, gi.SelectedBee);
+            Assert.AreEqual(null, gi.Bees);
+        }
+
+        [TestMethod]
+        public void ProcessHit_Failed_GameCreate()
+        {
+            //arrange
+            int gameiD = 1;
+
+            Mock<IRepository> repository = new Mock<IRepository>();
+            repository.Setup(r => r.Restore(It.Is<int>((b) => b == gameiD))).Returns(() => { return null; }); // game not exist
+
+            IService service = new Service(repository.Object, null, null, null, null);
+
+            // perform
+            GameInfo gi = service.ProcessHit(gameiD);
+
+            // check
+            Assert.IsTrue(gi.State == GameState.Unknown);
+            Assert.AreEqual(null, gi.SelectedBee);
+            Assert.AreEqual(null, gi.Bees);
         }
     }
 }
