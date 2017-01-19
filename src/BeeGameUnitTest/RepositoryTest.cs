@@ -36,9 +36,7 @@ namespace BeeGameUnitTest
         public void Restore_Successful()
         {
             int gameId = this.repository.Save(this.bees);
-            Assert.AreEqual(1, gameId);
-
-            List<Bee> restored = this.repository.Restore(1);
+            List<Bee> restored = this.repository.Restore(gameId);
             Assert.AreEqual(6, restored.Count);
             Assert.AreEqual(this.bees[0].Type, restored[0].Type);
         }
@@ -47,9 +45,8 @@ namespace BeeGameUnitTest
         public void Restore_Failed()
         {
             int gameId = this.repository.Save(this.bees);
-            Assert.AreEqual(1, gameId);
 
-            List<Bee> restored = this.repository.Restore(2);
+            List<Bee> restored = this.repository.Restore(gameId + 1);
             Assert.IsNull(restored);
         }
 
@@ -57,9 +54,7 @@ namespace BeeGameUnitTest
         public void Remove_Successful()
         {
             int gameId = this.repository.Save(this.bees);
-            Assert.AreEqual(1, gameId);
-
-            bool res = this.repository.Remove(1);
+            bool res = this.repository.Remove(gameId);
             Assert.IsTrue(res);
         }
 
@@ -67,9 +62,8 @@ namespace BeeGameUnitTest
         public void Remove_Failed()
         {
             int gameId = this.repository.Save(this.bees);
-            Assert.AreEqual(1, gameId);
 
-            bool res = this.repository.Remove(2);
+            bool res = this.repository.Remove(gameId + 1);
             Assert.IsTrue(!res);
         }
     }
