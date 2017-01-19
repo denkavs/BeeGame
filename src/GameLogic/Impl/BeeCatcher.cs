@@ -10,9 +10,16 @@ namespace GameLogic.Impl
 {
     class BeeCatcher : IBeeCatcher
     {
-        public Bee Hit(List<Bee> bees)
+        private static readonly Random rand = new Random();
+        static BeeCatcher() { }
+
+        public virtual Bee Hit(List<Bee> bees)
         {
-            throw new NotImplementedException();
+            List<Bee> toProcess = bees.Select(b => b).Where(b => b.IsAlive()).ToList(); // take all alive bees
+            int min = 0;
+            int max = toProcess.Count();
+            int index = rand.Next(min,max);
+            return bees.First(b=>b.Id == toProcess[index].Id);
         }
     }
 }
