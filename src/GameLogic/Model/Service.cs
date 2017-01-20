@@ -51,6 +51,10 @@ namespace GameLogic.Model
                     {
                         this.repository.Remove(gameId);
                     }
+                    else
+                    {
+                        this.repository.Save(bees, gameId);
+                    }
                 }
                 else
                 {

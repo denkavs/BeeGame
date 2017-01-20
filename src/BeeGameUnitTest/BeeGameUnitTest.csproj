@@ -61,6 +61,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Infrastructure\BeeCatcherPredefined.cs" />
     <Compile Include="ServiceTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="GamePlayEngineTest.cs" />
@@ -68,6 +69,7 @@
     <Compile Include="BeeCatcherTest.cs" />
     <Compile Include="GameFactoryTest.cs" />
     <Compile Include="ConfigurationTest.cs" />
+    <Compile Include="GameIntergationTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GameLogic\GameLogic.csproj">
@@ -75,11 +77,12 @@
       <Name>GameLogic</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Infrastructure\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="OrderedTest1.orderedtest">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <Choose>

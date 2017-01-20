@@ -66,5 +66,19 @@ namespace BeeGameUnitTest
             bool res = this.repository.Remove(gameId + 1);
             Assert.IsTrue(!res);
         }
+
+        [TestMethod]
+        public void Save_ExistingGame()
+        {
+            int gameId = this.repository.Save(this.bees);
+
+            List<Bee> bees = this.repository.Restore(gameId);
+
+            bees.ForEach(b=>b.RemoveLifeSpan(b.LifeSpan));
+            this.repository.Save(bees, gameId);
+
+            bees = this.repository.Restore(gameId);
+            Assert.IsTrue(bees.TrueForAll(b => !b.IsAlive()));
+        }
     }
 }

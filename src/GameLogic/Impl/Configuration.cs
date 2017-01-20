@@ -15,7 +15,6 @@ namespace GameLogic.Impl
         public List<BeeConfig> GetInitData()
         {
             List<BeeConfig> result = new List<BeeConfig>();
-            string test = (string)ConfigurationManager.AppSettings["Test"];
             BeeConfigSection section = (BeeConfigSection)ConfigurationManager.GetSection("BeeConfig");
             if(section != null)
             {

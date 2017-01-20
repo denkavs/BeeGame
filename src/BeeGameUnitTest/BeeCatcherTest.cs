@@ -62,5 +62,13 @@ namespace BeeGameUnitTest
             bee = this.catcher.Hit(this.bees);
             Assert.IsTrue(bee.Id == 1 || bee.Id == 2);
         }
+
+        [TestMethod]
+        public void Hit_ReturnNull_AllDied()
+        {
+            this.bees.ForEach(b => {  b.RemoveLifeSpan(b.LifeSpan); });
+            Bee bee = this.catcher.Hit(this.bees);
+            Assert.IsNull(bee);
+        }
     }
 }

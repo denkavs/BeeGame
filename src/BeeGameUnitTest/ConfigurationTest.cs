@@ -5,18 +5,18 @@ using GameLogic.Interfaces;
 using System.Configuration;
 using GameLogic.Infrastructure;
 using GameLogic.Model;
+using BeeGameUnitTest.Infrastructure;
 
 namespace BeeGameUnitTest
 {
     [TestClass]
     public class ConfigurationTest
     {
-        private static BeeConfigSection section;
 
         [ClassInitialize]
         public static void ClassInit(TestContext context)
         {
-            section = CreateSection();
+            CreateSection();
         }
 
         [ClassCleanup]
@@ -83,11 +83,6 @@ namespace BeeGameUnitTest
             }
 
             return section;
-        }
-
-        [TestInitialize]
-        public void Initialize()
-        {
         }
 
         [TestMethod]

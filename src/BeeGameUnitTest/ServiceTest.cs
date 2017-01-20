@@ -48,7 +48,7 @@ namespace BeeGameUnitTest
             factory.Setup(f => f.CreateBees(It.IsAny<List<BeeConfig>>())).Returns(ServiceTest.bees);
 
             Mock<IRepository> repository = new Mock<IRepository>();
-            repository.Setup(r => r.Save(It.Is<List<Bee>>((b) => Object.ReferenceEquals(b, ServiceTest.bees)))).Returns(ServiceTest.gameId);
+            repository.Setup(r => r.Save(It.Is<List<Bee>>((b) => Object.ReferenceEquals(b, ServiceTest.bees)), 0)).Returns(ServiceTest.gameId);
 
             IService service = new Service(repository.Object, null, config.Object, factory.Object, null);
 

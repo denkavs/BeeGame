@@ -18,8 +18,11 @@ namespace GameLogic.Impl
             List<Bee> toProcess = bees.Select(b => b).Where(b => b.IsAlive()).ToList(); // take all alive bees
             int min = 0;
             int max = toProcess.Count();
+            if (max == 0)
+                return null;
+
             int index = rand.Next(min,max);
-            return bees.First(b=>b.Id == toProcess[index].Id);
+            return bees.FirstOrDefault(b=>b.Id == toProcess[index].Id);
         }
     }
 }

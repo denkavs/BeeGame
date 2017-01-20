@@ -10,9 +10,9 @@ namespace GameLogic.Impl
 {
     class Repository : IRepository
     {
-        private static readonly Dictionary<int, List<Bee>> deport = new Dictionary<int, List<Bee>>();
-        private static int index = 0;
-        private static readonly Object locker = new object();
+        private readonly Dictionary<int, List<Bee>> deport = new Dictionary<int, List<Bee>>();
+        private int index = 0;
+        private readonly Object locker = new object();
         static Repository()
         {
         }
@@ -43,7 +43,7 @@ namespace GameLogic.Impl
             return result;
         }
 
-        public int Save(List<Bee> bees)
+        public int Save(List<Bee> bees, int gameId = 0)
         {
             int result = 0;
 
@@ -51,8 +51,21 @@ namespace GameLogic.Impl
             {
                 lock (locker)
                 {
-                    result = ++index;
-                    deport.Add(result, bees);
+                    if(gameId == 0)
+                    {
+                        // create new game
+                        result = ++index;
+                        deport.Add(result, bees);
+                    }
+                    else
+                    {
+                        // update old game
+                        if (deport.ContainsKey(gameId))
+                        {
+                            deport[gameId] = bees;
+                            result = gameId;
+                        }
+                    }
                 }
             }
             return result;
