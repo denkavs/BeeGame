@@ -8,12 +8,27 @@ using GameLogic.Impl;
 using BeeGameUnitTest.Infrastructure;
 using System.Linq;
 using System.Threading;
+using System.Collections.Generic;
 
 namespace BeeGameUnitTest
 {
     [TestClass]
     public class GameIntergationTest
     {
+        class PredefinedConfiguration : IConfiguration
+        {
+            public List<BeeConfig> GetInitData()
+            {
+                List<BeeConfig> result = new List<BeeConfig>();
+
+                result.Add(new BeeConfig() { Type = BeeType.Queen, Count = queenCount, Deduction = queenDeduction, LifeSpan = queenLifeScope });
+                result.Add(new BeeConfig() { Type = BeeType.Worker, Count = workerCount, Deduction = workerDeduction, LifeSpan = workerLifeScope });
+                result.Add(new BeeConfig() { Type = BeeType.Drone, Count = droneCount, Deduction = droneDeduction, LifeSpan = droneLifeScope });
+
+                return result; 
+            }
+        }
+
         private static int queenLifeScope = 5;
         private static int queenDeduction = 2;
         private static int queenCount = 1;
@@ -26,75 +41,6 @@ namespace BeeGameUnitTest
         private static int droneDeduction = 1;
         private static int droneCount = 3;
 
-        private static void ClearSection()
-        {
-            System.Configuration.Configuration config =
-                    ConfigurationManager.OpenExeConfiguration(
-                    ConfigurationUserLevel.None);
-
-            BeeConfigSection tempSection = (BeeConfigSection)config.Sections["BeeConfig"];
-            if (tempSection != null)
-            {
-                config.Sections.Remove("BeeConfig");
-                config.Save(ConfigurationSaveMode.Modified, true);
-                ConfigurationManager.RefreshSection("BeeConfig");
-            }
-        }
-
-        private static BeeConfigSection CreateSection()
-        {
-            BeeConfigSection section = null;
-
-            try
-            {
-                // create section dinamicly and add it to config file
-                System.Configuration.Configuration config =
-                        ConfigurationManager.OpenExeConfiguration(
-                        ConfigurationUserLevel.None);
-
-                BeeConfigSection tempSection = (BeeConfigSection)config.Sections["BeeConfig"];
-
-                if (tempSection == null)
-                {
-                    tempSection = new BeeConfigSection();
-
-                    config.Sections.Add("BeeConfig", tempSection);
-
-                    BeeConfigElement element = new BeeConfigElement("queen", queenDeduction, queenCount, queenLifeScope);
-                    tempSection.Bees.Add(element);
-                    element = new BeeConfigElement("worker", workerDeduction, workerCount, workerLifeScope);
-                    tempSection.Bees.Add(element);
-
-                    element = new BeeConfigElement("drone", droneDeduction, droneCount, droneLifeScope);
-                    tempSection.Bees.Add(element);
-
-                    // Save the application configuration file.
-                    tempSection.SectionInformation.ForceSave = true;
-                    config.Save(ConfigurationSaveMode.Modified);
-                    ConfigurationManager.RefreshSection("BeeConfig");
-
-                    section = tempSection;
-                }
-            }
-            catch (Exception e)
-            {
-            }
-
-            return section;
-        }
-
-        [ClassInitialize]
-        public static void ClassInit(TestContext context)
-        {
-            CreateSection();
-        }
-
-        [ClassCleanup]
-        public static void ClassCleanUp()
-        {
-            ClearSection();
-        }
-
         [TestInitialize]
         public void Initialize()
         {
@@ -106,7 +52,7 @@ namespace BeeGameUnitTest
         {
             IRepository repository = new Repository();
             IBeeCatcher catcher = new BeeCatcherPredefined(1,1,2);
-            IConfiguration config = new GameLogic.Impl.Configuration();
+            IConfiguration config = new PredefinedConfiguration();
             IGameFactory factory = new GameFactory();
             IGamePlayEngine engine = new GamePlayEngine(config);
 
@@ -125,7 +71,7 @@ namespace BeeGameUnitTest
         {
             IRepository repository = new Repository();
             IBeeCatcher catcher = new BeeCatcherPredefined(0, 1, 2);
-            IConfiguration config = new GameLogic.Impl.Configuration();
+            IConfiguration config = new PredefinedConfiguration();
             IGameFactory factory = new GameFactory();
             IGamePlayEngine engine = new GamePlayEngine(config);
 
@@ -150,7 +96,7 @@ namespace BeeGameUnitTest
         {
             IRepository repository = new Repository();
             IBeeCatcher catcher = new BeeCatcherPredefined(0, 0, 2);
-            IConfiguration config = new GameLogic.Impl.Configuration();
+            IConfiguration config = new PredefinedConfiguration();
             IGameFactory factory = new GameFactory();
             IGamePlayEngine engine = new GamePlayEngine(config);
 
@@ -173,9 +119,75 @@ namespace BeeGameUnitTest
         }
 
         [TestMethod]
-        public void GameFailed()
+        public void GameInProgress_KillQueen_Hit3Time_GameFinished()
         {
+            IRepository repository = new Repository();
+            IBeeCatcher catcher = new BeeCatcherPredefined(0, 0, 0);
+            IConfiguration config = new PredefinedConfiguration();
+            IGameFactory factory = new GameFactory();
+            IGamePlayEngine engine = new GamePlayEngine(config);
 
+            IService service = new Service(repository, catcher, config, factory, engine);
+
+            GameInfo gi = service.ProcessHit(0);
+            int gameId = gi.GameId;
+
+            gi = service.ProcessHit(gameId);
+            gi = service.ProcessHit(gameId);
+            gi = service.ProcessHit(gameId);
+
+            Assert.AreEqual(GameState.Finished, gi.State);
+            Assert.AreEqual(gameId, gi.GameId);
+            Assert.AreEqual(6, gi.Bees.Count);
+            Assert.AreEqual(BeeType.Queen, gi.SelectedBee.Type);
+            Assert.AreEqual(0, gi.SelectedBee.LifeSpan);
+
+            Assert.AreEqual(0, gi.Bees.Select(b => b).Where(b => (b.Type == BeeType.Worker && b.LifeSpan > 0)).Count<Bee>());
+            Assert.AreEqual(0, gi.Bees.Select(b => b).Where(b => (b.Type == BeeType.Drone && b.LifeSpan > 0)).Count<Bee>());
+        }
+
+        [TestMethod]
+        public void GameInProgress_GameFinished_HitGameAgain_UnknownGame()
+        {
+            IRepository repository = new Repository();
+            IBeeCatcher catcher = new BeeCatcherPredefined(0, 0, 0);
+            IConfiguration config = new PredefinedConfiguration();
+            IGameFactory factory = new GameFactory();
+            IGamePlayEngine engine = new GamePlayEngine(config);
+
+            IService service = new Service(repository, catcher, config, factory, engine);
+
+            GameInfo gi = service.ProcessHit(1);
+
+            Assert.AreEqual( GameState.Unknown, gi.State);
+        }
+
+        [TestMethod]
+        public void GameInProgress_HitAllWorker_OneDrone()
+        {
+            IRepository repository = new Repository();
+            IBeeCatcher catcher = new BeeCatcherPredefined(1, 2, 3);
+            IConfiguration config = new PredefinedConfiguration();
+            IGameFactory factory = new GameFactory();
+            IGamePlayEngine engine = new GamePlayEngine(config);
+
+            IService service = new Service(repository, catcher, config, factory, engine);
+
+            GameInfo gi = service.ProcessHit(0);
+            int gameId = gi.GameId;
+
+            gi = service.ProcessHit(gameId);
+            gi = service.ProcessHit(gameId);
+            gi = service.ProcessHit(gameId);
+
+            Assert.AreEqual(GameState.InProgress, gi.State);
+            Assert.AreEqual(gameId, gi.GameId);
+            Assert.AreEqual(6, gi.Bees.Count);
+            Assert.AreEqual(BeeType.Drone, gi.SelectedBee.Type);
+            Assert.AreEqual(1, gi.SelectedBee.LifeSpan);
+
+            Assert.AreEqual(0, gi.Bees.Select(b => b).Where(b => (b.Type == BeeType.Worker && b.LifeSpan == workerLifeScope)).Count<Bee>());
+            Assert.AreEqual(2, gi.Bees.Select(b => b).Where(b => (b.Type == BeeType.Drone && b.LifeSpan == droneLifeScope)).Count<Bee>());
         }
     }
 }
