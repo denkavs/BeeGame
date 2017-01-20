@@ -1,0 +1,31 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Bee Hit Game</title>
+
+    <script src="angularjs/angular.js" type="text/javascript"></script>
+    <script src="angularjs/angular-route.js" type="text/javascript"></script>
+
+    <script src="js/beeModule.js" type="text/javascript"></script>
+    <script src="js/ajaxService.js" type="text/javascript"></script>
+    <script src="js/gameService.js" type="text/javascript"></script>
+    <script src="js/gameController.js" type="text/javascript"></script>
+</head>
+<body>
+    <div ng-app="BeeModule">
+        <div ng-controller="GameController as root">
+            <input type="button" value="Hit" ng-click="root.Hit()" />
+            <p><span>Game status: </span>{{root.gameState}}</p>
+            <p><span>Game Id:</span> {{root.GameId}}</p>
+            <div>
+                <ul ng-repeat="bee in root.bees" >
+                    <li><span>Bee type: {{root.GetNameBeeById(bee.Type)}} id - [{{bee.Id}}] lifeSpan - [{{bee.LifeSpan}}]</span><span>  {{root.IsCurrentHitted(bee.Id) ? 'hitted': ''}}</span> </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
