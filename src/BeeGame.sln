@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeeGameUnitTest", "BeeGameU
 		{C1686B3B-A1F7-4B06-8323-FE1F0D40892A} = {C1686B3B-A1F7-4B06-8323-FE1F0D40892A}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeeGameHost", "BeeGameHost\BeeGameHost.csproj", "{90D5DF73-3E16-485C-A24A-4ED871560F6A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,6 +26,10 @@ Global
 		{D013EA2C-2F6C-46C7-99A5-715C6A3F1BA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D013EA2C-2F6C-46C7-99A5-715C6A3F1BA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D013EA2C-2F6C-46C7-99A5-715C6A3F1BA8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90D5DF73-3E16-485C-A24A-4ED871560F6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90D5DF73-3E16-485C-A24A-4ED871560F6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90D5DF73-3E16-485C-A24A-4ED871560F6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90D5DF73-3E16-485C-A24A-4ED871560F6A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
