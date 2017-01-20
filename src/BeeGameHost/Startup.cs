@@ -17,6 +17,8 @@ namespace BeeGameHost
 
             config.DependencyResolver = new NinjectResolver();
 
+            config.EnableCors();
+
             config.Routes.MapHttpRoute(
             name: "DefaultApi",
             routeTemplate: "api/{controller}/{id}",

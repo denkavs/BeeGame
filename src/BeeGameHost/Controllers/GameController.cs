@@ -1,14 +1,11 @@
 ﻿using GameLogic.Interfaces;
 using GameLogic.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web.Http;
+using System.Web.Http.Cors;
 
 namespace BeeGameHost.Controllers
 {
+    [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class GameController : ApiController
     {
         private IService beeGameService;
