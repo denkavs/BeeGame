@@ -3,4 +3,6 @@ src/GameLogic/bin/
 src/GameLogic/obj/
 src/BeeGameUnitTest/bin/
 src/BeeGameUnitTest/obj/
+src/BeeGameHost/bin/
+src/BeeGameHost/obj/
 src/.vs/
