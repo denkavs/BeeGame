@@ -84,6 +84,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\GameController.cs" />
     <Compile Include="Infrastructure\HostConfigMgr.cs" />
     <Compile Include="Infrastructure\NinjectResolver.cs" />
     <Compile Include="Program.cs" />

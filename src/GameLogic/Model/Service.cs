@@ -27,7 +27,11 @@ namespace GameLogic.Model
         public GameInfo ProcessHit(int gameId)
         {
             GameInfo gi;
-            if(gameId == 0)
+
+            if(gameId < 0)
+                return new GameInfo(0, null, null, GameState.Unknown, "Unknown game.");
+
+            if (gameId == 0)
             {
                 // create new game
                 List<BeeConfig> cofiguration = this.confMgr.GetInitData();
@@ -37,8 +41,9 @@ namespace GameLogic.Model
             }
             else
             {
-                // load game by gameId, make hit, return result
+                // Here we will do: load game by gameId, make hit, return result.
                 List<Bee> bees = this.repository.Restore(gameId);
+
                 // if bees == null then game does not exist.
                 if(bees != null)
                 {
