@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GameLogic.Model;
+using System.Configuration;
+using GameLogic.Infrastructure;
 
 namespace GameLogic.Impl
 {
@@ -12,7 +14,18 @@ namespace GameLogic.Impl
     {
         public List<BeeConfig> GetInitData()
         {
-            throw new NotImplementedException();
+            List<BeeConfig> result = new List<BeeConfig>();
+            string test = (string)ConfigurationManager.AppSettings["Test"];
+            BeeConfigSection section = (BeeConfigSection)ConfigurationManager.GetSection("BeeConfig");
+            if(section != null)
+            {
+                foreach (BeeConfigElement element in section.Bees)
+                {
+                    result.Add(new BeeConfig() { Type = element.GetBeeType(), LifeSpan = element.LifeSpan, Count = element.Count, Deduction = element.Deduction });
+                }
+            }
+
+            return result;
         }
     }
 }

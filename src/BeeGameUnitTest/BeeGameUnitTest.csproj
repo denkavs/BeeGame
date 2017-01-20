@@ -44,6 +44,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
@@ -66,6 +67,7 @@
     <Compile Include="RepositoryTest.cs" />
     <Compile Include="BeeCatcherTest.cs" />
     <Compile Include="GameFactoryTest.cs" />
+    <Compile Include="ConfigurationTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GameLogic\GameLogic.csproj">
@@ -77,6 +79,7 @@
     <Folder Include="Infrastructure\" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <Choose>
